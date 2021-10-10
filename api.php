@@ -24,7 +24,7 @@ if($debug_mode==0){
     $result=1;
 }
 if($result==""){
-    $cin = passthru("sudo cat ".$rID.".in|sudo /tmp/ide/".$rID." 2>&1");
+    $cin = passthru("sudo /tmp/ide/".$rID." 2>&1 </tmp/ide/".$rID.".in");
     echo str_replace("\n","<br>",$cin); //把换行转为html
 }else{
     echo "start".$result."end";

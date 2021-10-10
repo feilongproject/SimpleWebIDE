@@ -8,10 +8,10 @@
     <script src="https://cdn.staticfile.org/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
     <script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script>
-    async function runcode(code,type){
+    async function runcode(code,cin,type){
         console.log(code,type);
-        if(type == "csharp"){
-          var res=await fetch("http://demo.demo/ide/api.php?code="+escape(code)+"&cin=");
+        if(type == "c_cpp"){
+          var res=await fetch("http:///ide/api.php?code="+encodeURIComponent(code)+"&cin="+encodeURIComponent(cin));
           var data = await res.text();
           $("#output").html("<pre class=\"fillall\">" + data.replace(/</g,"<").replace(/>/g,">").replace(/\n/g,"<br>") + "</pre>");
         }
@@ -20,6 +20,7 @@
     </script>
     <style type="text/css" media="screen">
       #editor {margin: 0;position: absolute;top: 0;bottom: 0;left: 0;right: 0;}
+      #cin {margin: 0;height:100px;top: 0;bottom: 0;left: 0;right: 0;}
       .container {margin: 0;top: 0;bottom: 0;}
       #editordiv {margin: 0;position: absolute;top: 0;bottom: 0;left:0;right:58.33333333333334%;}
       #iframediv {margin: 0;position: absolute;top: 0;bottom: 50%;left: 41.66666666666667%;right:16.66666666666667%;}
@@ -28,13 +29,14 @@
     </style>
   </head>
   <body>
-
+  <div>
     <div class="container">
       <div class="col-md-5 column" id="editordiv">
         <pre id="editor"></pre>
       </div>
       <div class="col-md-5 column" id="iframediv">
-        <h3>运行结果：</h3>
+	  <pre id="cin"></pre>
+          <h3>运行结果：</h3>
         <div id="output"></div>
       </div>
       <div class="col-md-5 column" id="stepdiv">
@@ -46,7 +48,7 @@
         <!-- 更改语言-start -->
         <div class="form-group">
           <select name="language" id="language" class="form-control">
-            <option value="csharp" selected>C++（.cpp）</option>
+            <option value="c_cpp" selected>C++（.cpp）</option>
           </select>
 
           <button id="changelang" class="btn btn-default">
@@ -115,10 +117,15 @@
     </div>
     <script src="src-min-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
     <script>
+      var cin = ace.edit("cin");
+      cin.setOptions({enableLiveAutocompletion: true});
+      cin.setTheme("ace/theme/tomorrow_night");
+      cin.session.setMode("ace/mode/c_cpp");
+
       var editor = ace.edit("editor");
       editor.setOptions({enableLiveAutocompletion: true});
-      editor.setTheme("ace/theme/chrome");
-      editor.session.setMode("ace/mode/csharp");
+      editor.setTheme("ace/theme/tomorrow_night");
+      editor.session.setMode("ace/mode/c_cpp");
       $("#changelang").click(function(){
         editor.session.setMode("ace/mode/" + $("#language").val());
       });
@@ -126,7 +133,7 @@
         editor.setTheme("ace/theme/" + $("#skin").val());
       });
       $("#cheak").click(function(){
-        var result = runcode(editor.getValue(), $("#language").val());
+        var result = runcode(editor.getValue(),cin.getValue(), $("#language").val());
       });
       $("#savecode").click(function(){
         $.cookie("File-" + $("#filename").val(), editor.getValue());
