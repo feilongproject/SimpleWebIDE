@@ -12,12 +12,23 @@ $debug_mode=0;
 //exit();
 if($debug_mode==0){
     $rID = rand();//为用户的代码取一个随机数作为唯一码
+    $stat = $_GET['stat'];
+    if($stat=="save"){
+        $codef = fopen("/var/www/html/ide/backup.cpp", "w");
+	fwrite($codef,$_GET['code']);
+        fclose($codef);
+	exit();
+    }elseif($stat=="load"){
+        echo passthru("cat /var/www/html/ide/backup.cpp 2>&1");
+        exit();
+    }
     $codef = fopen("/tmp/ide/".$rID.".cpp", "w");
     $cinf = fopen("/tmp/ide/".$rID.".in", "w");
     fwrite($codef,$_GET['code']);
     fclose($codef);
     fwrite($cinf,$_GET['cin']);
     fclose($cinf);
+
     $result=passthru("sudo g++ /tmp/ide/".$rID.".cpp -o /tmp/ide/".$rID." 2>&1");
 }else{
     $rID="t";
